@@ -1,5 +1,5 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_title": "Page de statut Air France/KLM",
-  "dismiss_alert": ""
+  "dismiss_alert": "Ignorer l'alerte"
 }
