@@ -16,3 +16,5 @@
 </Template>
 
 <Story name="Alert Danger" args={{ theme: 'danger' }} />
+
+<Story name="Alert Danger Dismissible" args={{ theme: 'danger', dismissible: true }} />

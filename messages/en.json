@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_title": "Air France/KLM Status Page",
-  "dismiss_alert": "Dismiss Alert"
+  "dismiss_alert": "Dismiss Alert",
+  "footer_contact": "For help, contact flightstatus[at]afetiveau[dot]com",
+  "footer_licensed_under": "Licensed under GNU General Public License v3.0",
+  "search_flight": "Search Flight"
 }

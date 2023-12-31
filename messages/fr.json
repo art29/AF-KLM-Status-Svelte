@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_title": "Page de statut Air France/KLM",
-  "dismiss_alert": "Ignorer l'alerte"
+  "dismiss_alert": "Ignorer l'alerte",
+  "search_flight": "Rechercher le vol",
+  "footer_licensed_under": "Sous la license GNU General Public License v3.0",
+  "search_flight": "Chercher le vol"
 }
