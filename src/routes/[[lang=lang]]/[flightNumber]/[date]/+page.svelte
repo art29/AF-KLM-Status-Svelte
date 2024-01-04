@@ -255,7 +255,7 @@
 					<Fa icon={faStopwatch} size="lg"></Fa>
 					{m.duration()}
 				</span>
-				<span>
+				<span class="text-right">
 					{flightLeg.scheduledFlightDuration?.replace('PT', '')}
 				</span>
 			</div>
@@ -265,7 +265,7 @@
 					<Fa icon={faWifi} size="lg"></Fa>
 					{m.wifi_enabled()}
 				</span>
-				<span>
+				<span class="text-right">
 					{flightLeg.aircraft?.wifiEnabled === 'Y' ? m.yes() : m.no()}
 				</span>
 			</div>
@@ -275,7 +275,7 @@
 					<Fa icon={faLuggageCart} size="lg"></Fa>
 					{m.baggage_carousel()}
 				</span>
-				<span>
+				<span class="text-right">
 					{stringArrayOrDash(flightLeg.arrivalInformation?.airport?.places?.baggageBelt)}
 				</span>
 			</div>
@@ -285,7 +285,7 @@
 					<Fa icon={faIdCard} size="lg"></Fa>
 					{m.aircraft_info()}
 				</span>
-				<span>
+				<span class="text-right">
 					{flightLeg.aircraft?.typeName}
 					{flightLeg.aircraft?.registration
 						? `(${flightLeg.aircraft.registration[0]}-${flightLeg.aircraft.registration.substring(
@@ -300,7 +300,7 @@
 					<Fa icon={faUserGear} size="lg"></Fa>
 					{m.pax_config()}
 				</span>
-				<span>
+				<span class="text-right">
 					{flightLeg.aircraft?.physicalPaxConfiguration}
 					<br />
 					<span

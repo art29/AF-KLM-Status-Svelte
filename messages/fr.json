@@ -1,6 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"app_title": "Page de statut Air France/KLM",
+	"app_title": "Statut Air France/KLM",
 	"dismiss_alert": "Ignorer l'alerte",
 	"footer_contact": "Pour obtenir de l'aide, contactez flightstatus[at]afetiveau[dot]com",
 	"footer_licensed_under": "Sous la license GNU General Public License v3.0",
