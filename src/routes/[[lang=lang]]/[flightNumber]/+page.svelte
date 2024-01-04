@@ -7,18 +7,19 @@
 	import * as m from '$paraglide/messages';
 	import { goto } from '$app/navigation';
 	import { callAFKLMAPI, route } from '$lib/helpers';
-	import { type OperationalFlight, savedFlights } from '../../../stores';
-	import { get } from 'svelte/store';
+	import { type OperationalFlight } from '../../../stores';
 	import { DoubleBounce } from 'svelte-loading-spinners';
+	import Alert from '$lib/Alert.svelte';
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
 	let operationalFlights: OperationalFlight[] = [];
+	let error = false;
 
 	onMount(async () => {
-		get(savedFlights).find((f) =>
-			f.key.includes(`${f.flightData.airline?.code}_${f.flightData.flightNumber}`)
-		);
 		operationalFlights = await callAFKLMAPI($page.params.flightNumber, lang);
+		if (operationalFlights.length === 0) {
+			error = true;
+		}
 	});
 
 	const goToDetailsPage = (date: string | undefined): void => {
@@ -40,10 +41,12 @@
 		{m.next_params_flights({ flightNo: $page.params.flightNumber })}
 	</h2>
 	<div class="flex flex-col gap-2 w-full">
-		{#if operationalFlights.length === 0}
+		{#if operationalFlights.length === 0 && error === false}
 			<div class="flex flex-col items-center justify-center w-full h-32">
 				<DoubleBounce color="#0045B6" size="64" />
 			</div>
+		{:else if operationalFlights.length === 0 && error === true}
+			<Alert>{m.flight_not_found()}</Alert>
 		{/if}
 		{#each operationalFlights as operationalFlight}
 			<Button
