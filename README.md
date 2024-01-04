@@ -1,38 +1,35 @@
-# create-svelte
+# AF-KLM Flight Status App
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This app is made to get as much information about a flight as possible. This includes latest information on delays, aircraft type and registration and more!
 
-## Creating a project
+## Technical Side of things
 
-If you're seeing this, you've probably already done this step. Congrats!
+The app uses the following main components :
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- [SvelteKit](https://kit.svelte.dev/) - The web framework used
+- [TailwindCSS](https://tailwindcss.com/) - CSS framework
+- [AirFrance-KLM API](https://developer.airfranceklm.com/products/) - The API used to get the flight information
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+### Installation
 
-## Developing
+1. Clone the repo
+2. Install the dependencies
+   ```sh
+   yarn
+   ```
+3. Create a `.env` file in the root of the project and add the following variables:
+   ```txt
+   PUBLIC_AIRFRANCE_KLM_API_KEY=YOUR_API_KEY
+   ```
+4. Run the project
+   ```sh
+   yarn dev
+   ```
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### License
 
-```bash
-npm run dev
+This App has a AGPL-3.0 License. See `LICENSE` for more information.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### Contributing
 
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Contributions are always welcome! Feel free to open a PR or Issue.
