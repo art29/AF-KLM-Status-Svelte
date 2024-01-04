@@ -1,0 +1,324 @@
+<script lang="ts">
+	import * as m from '$paraglide/messages';
+	import { get } from 'svelte/store';
+	import { savedFlights } from '../../../../stores';
+	import { page } from '$app/stores';
+	import Button from '$lib/Button.svelte';
+	import Fa from 'svelte-fa';
+	import { tooltip } from '@svelte-plugins/tooltips';
+	import {
+		faArrowLeft,
+		faIdCard,
+		faInfoCircle,
+		faLuggageCart,
+		faPlane,
+		faRotateRight,
+		faStopwatch,
+		faUserGear,
+		faWifi
+	} from '@fortawesome/free-solid-svg-icons';
+	import { DateTime } from 'luxon';
+	import { goto } from '$app/navigation';
+	import { callAFKLMAPI, route, stringArrayOrDash } from '$lib/helpers';
+	import { sourceLanguageTag } from '$paraglide/runtime';
+	import Alert from '$lib/Alert.svelte';
+	import { DoubleBounce } from 'svelte-loading-spinners';
+
+	const previouslySavedFlights = get(savedFlights);
+	const carrierCode = ($page.params.flightNumber.match(/^[A-Z]{2,3}/) || [''])[0];
+	const flightNumber = $page.params.flightNumber.replace(/^[A-Z]{2,3}/, '');
+	let flight = previouslySavedFlights.find(
+		(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}`
+	);
+	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
+	let error = false;
+
+	const back = (): void => {
+		goto(route(`/${$page.params.flightNumber}`, $page.params.lang ?? sourceLanguageTag));
+	};
+
+	const refresh = (): void => {
+		callAFKLMAPI($page.params.flightNumber, lang).then(() => {
+			flight = get(savedFlights).find(
+				(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}`
+			);
+
+			if (!flight) {
+				error = true;
+			}
+		});
+	};
+
+	if (
+		!flight ||
+		Math.floor((new Date().getTime() - Date.parse(String(flight.lastUpdated))) / 60000) > 10
+	) {
+		refresh();
+	}
+
+	const boardingStatus = (boardingStatus?: string): string => {
+		switch (boardingStatus) {
+			case 'Not Open': {
+				return `(${m.boarding_not_open()})`;
+			}
+			case 'Open': {
+				return `(${m.boarding_open()})`;
+			}
+			case 'Closed': {
+				return `(${m.boarding_closed()})`;
+			}
+			default: {
+				return '';
+			}
+		}
+	};
+
+	const contactType = (contactType?: string, buses?: string): string => {
+		switch (contactType) {
+			case 'C': {
+				return m.via_jetbridge();
+			}
+			case 'F': {
+				return m.via_stairs() + (buses ? ` (${m.x_buses_incoming({ count: buses })})` : '');
+			}
+			case 'L': {
+				return m.via_bus() + (buses ? ` (${m.x_buses_incoming({ count: buses })})` : '');
+			}
+			default: {
+				return '';
+			}
+		}
+	};
+
+	const displayTime = (
+		scheduledTime?: string | undefined,
+		actual?: string | undefined,
+		estimated?: string | undefined
+	): string => {
+		let time = '';
+		if (!scheduledTime) {
+			return '-';
+		} else {
+			time = DateTime.fromISO(scheduledTime, {
+				setZone: true
+			}).toLocaleString(DateTime.TIME_24_SIMPLE);
+
+			if (actual) {
+				time += ` (${m.actual()}${DateTime.fromISO(actual, {
+					setZone: true
+				}).toLocaleString(DateTime.TIME_24_SIMPLE)})`;
+			} else if (estimated) {
+				time += ` (${m.estimated()}${DateTime.fromISO(estimated, {
+					setZone: true
+				}).toLocaleString(DateTime.TIME_24_SIMPLE)})`;
+			}
+
+			return time;
+		}
+	};
+</script>
+
+{#if flight}
+	<div class="flex flex-col mx-4 md:mx-[20%] gap-4">
+		<Button theme="secondary" textXl={false} on:click={back}>
+			<span class="mr-1">
+				<Fa icon={faArrowLeft} />
+			</span>
+			{m.back()}
+		</Button>
+		<h1 class="font-sans font-semibold text-4xl">
+			{flight.flightData.airline?.code}
+			{flight.flightData.flightNumber} - {flight.flightData.flightScheduleDate &&
+				DateTime.fromFormat(flight.flightData.flightScheduleDate, 'yyyy-LL-dd').toLocaleString(
+					DateTime.DATE_MED
+				)}
+		</h1>
+		<div class="flex justify-between">
+			<div class="flex items-center text-gray-600">
+				<span class="mr-1"
+					>{m.updated_x_minutes_ago({
+						min: Math.floor((new Date().getTime() - Date.parse(String(flight.lastUpdated))) / 60000)
+					})}</span
+				>
+				<button on:click={refresh}><Fa size="lg" icon={faRotateRight}></Fa></button>
+			</div>
+			<a class="text-gray-600" href={`/${$page.params.lang ?? sourceLanguageTag}`}
+				>{m.track_another_flight()}</a
+			>
+		</div>
+		{#each flight.flightData.flightLegs ?? [] as flightLeg}
+			{#if flightLeg.irregularity?.delayReasonPublicLangTransl}
+				<Alert>
+					{flightLeg.irregularity?.delayReasonPublicLangTransl}
+				</Alert>
+			{/if}
+			<div>
+				<h2 class="text-3xl text-green-700 font-semibold">
+					{flightLeg.legStatusPublicLangTransl}
+				</h2>
+				<h3 class="text-gray-600">
+					{boardingStatus(flightLeg.otherFlightLegStatuses?.boardingStatus)}
+				</h3>
+			</div>
+			<div>
+				<h2 class="text-3xl">
+					{#if flightLeg.legStatusPublic === 'ARRIVED'}
+						{m.landed()}
+					{:else if flightLeg.timeToArrival}
+						{m.expected_to_land_in_x({ time: flightLeg.timeToArrival?.replace('PT', '') })}
+					{/if}
+				</h2>
+			</div>
+			<div class="flex items-center relative w-full">
+				<div
+					class="h-[3px] bg-green-700 absolute"
+					style="width: {flightLeg.completionPercentage}%"
+				></div>
+				<div
+					class="w-full h-[3px]"
+					style="background-image: linear-gradient(to right,#C4C4C4 0%,#C4C4C4 50%,transparent 50%); background-size: 1rem .2rem;"
+				></div>
+				<div
+					class="bg-gray-300 p-2 w-fit h-fit rounded-full absolute"
+					style="left: {flightLeg.completionPercentage}%"
+				>
+					<Fa icon={faPlane}></Fa>
+				</div>
+			</div>
+			<div class="flex justify-between mb-4">
+				<div>
+					<h4 class="text-2xl font-semibold">
+						{displayTime(
+							flightLeg.departureInformation?.times?.scheduled,
+							flightLeg.departureInformation?.times?.actual,
+							flightLeg.departureInformation?.times?.latestPublished
+						)}
+					</h4>
+					<p class="text-lg">{flightLeg.departureInformation?.airport?.nameLangTranl}</p>
+					<p class="text-lg">({flightLeg.departureInformation?.airport?.code})</p>
+				</div>
+				<div class="text-right">
+					<h4 class="text-2xl font-semibold">
+						{displayTime(
+							flightLeg.arrivalInformation?.times?.scheduled,
+							flightLeg.arrivalInformation?.times?.actual,
+							flightLeg.arrivalInformation?.times?.latestPublished
+						)}
+					</h4>
+					<p class="text-lg">{flightLeg.arrivalInformation?.airport?.nameLangTranl}</p>
+					<p class="text-lg">({flightLeg.arrivalInformation?.airport?.code})</p>
+				</div>
+			</div>
+			<div class="flex justify-between">
+				<div>
+					<p class="text-lg">
+						{m.terminal_x({
+							terminal: flightLeg.departureInformation?.airport?.places?.terminalCode ?? '-'
+						})}
+					</p>
+					<p class="text-lg">{m.gate()}</p>
+					<p class="text-xl font-semibold">
+						{stringArrayOrDash(flightLeg.departureInformation?.airport?.places?.gateNumber)}
+						{#if flightLeg.departureInformation?.airport?.places?.boardingContactType}
+							<span class="text-gray-600 text-sm">
+								{contactType(
+									flightLeg.departureInformation?.airport?.places?.boardingContactType,
+									flightLeg.departureInformation?.airport?.places?.boardingBusQuantity
+								)}
+							</span>
+						{/if}
+					</p>
+				</div>
+				<div class="text-right">
+					<p class="text-lg">
+						{m.terminal_x({
+							terminal: flightLeg.arrivalInformation?.airport?.places?.terminalCode ?? '-'
+						})}
+					</p>
+					<p class="text-lg">{m.gate()}</p>
+					<p class="text-xl font-semibold">
+						{stringArrayOrDash(flightLeg.arrivalInformation?.airport?.places?.gateNumber)}
+					</p>
+					{#if flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType}
+						<p class="text-gray-600">
+							{contactType(
+								flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType,
+								flightLeg.arrivalInformation?.airport?.places?.disembarkingBusQuantity
+							)}
+						</p>
+					{/if}
+				</div>
+			</div>
+			<hr class="border-top border-[1px] border-black" />
+			<div class="flex justify-between items-center text-lg">
+				<span class="gap-2 flex items-center">
+					<Fa icon={faStopwatch} size="lg"></Fa>
+					{m.duration()}
+				</span>
+				<span>
+					{flightLeg.scheduledFlightDuration?.replace('PT', '')}
+				</span>
+			</div>
+			<hr class="border-top border-[1px] border-black" />
+			<div class="flex justify-between items-center text-lg">
+				<span class="gap-2 flex items-center">
+					<Fa icon={faWifi} size="lg"></Fa>
+					{m.wifi_enabled()}
+				</span>
+				<span>
+					{flightLeg.aircraft?.wifiEnabled === 'Y' ? m.yes() : m.no()}
+				</span>
+			</div>
+			<hr class="border-top border-[1px] border-black" />
+			<div class="flex justify-between items-center text-lg">
+				<span class="gap-2 flex items-center">
+					<Fa icon={faLuggageCart} size="lg"></Fa>
+					{m.baggage_carousel()}
+				</span>
+				<span>
+					{stringArrayOrDash(flightLeg.arrivalInformation?.airport?.places?.baggageBelt)}
+				</span>
+			</div>
+			<hr class="border-top border-[1px] border-black" />
+			<div class="flex justify-between items-center text-lg">
+				<span class="gap-2 flex items-center">
+					<Fa icon={faIdCard} size="lg"></Fa>
+					{m.aircraft_info()}
+				</span>
+				<span>
+					{flightLeg.aircraft?.typeName}
+					{flightLeg.aircraft?.registration
+						? `(${flightLeg.aircraft.registration[0]}-${flightLeg.aircraft.registration.substring(
+								1
+							)})`
+						: '-'}
+				</span>
+			</div>
+			<hr class="border-top border-[1px] border-black" />
+			<div class="flex justify-between items-center text-lg text-right">
+				<span class="gap-2 flex items-center">
+					<Fa icon={faUserGear} size="lg"></Fa>
+					{m.pax_config()}
+				</span>
+				<span>
+					{flightLeg.aircraft?.physicalPaxConfiguration}
+					<br />
+					<span
+						use:tooltip={{ content: m.what_does_it_mean_text() }}
+						class="flex gap-1 items-center text-sm"
+					>
+						<Fa icon={faInfoCircle} size="sm"></Fa>
+						{m.what_does_it_mean()}
+					</span>
+				</span>
+			</div>
+			<hr class="border-top border-[1px] border-black mb-4" />
+		{/each}
+	</div>
+{:else if error}
+	<Alert>{m.flight_not_found()}</Alert>
+{:else}
+	<div class="flex flex-col items-center justify-center w-full h-32">
+		<DoubleBounce color="#0045B6" size="64" />
+	</div>
+{/if}
