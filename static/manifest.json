@@ -1,0 +1,14 @@
+{
+  "name": "AF/KLM Flight Status",
+  "description": "This app will show you the flight status of AF/KLM flights",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
