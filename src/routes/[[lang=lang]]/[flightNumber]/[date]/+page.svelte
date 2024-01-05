@@ -301,7 +301,7 @@
 					{m.pax_config()}
 				</span>
 				<span class="text-right">
-					{flightLeg.aircraft?.physicalPaxConfiguration}
+					{flightLeg.aircraft?.operationalConfiguration}
 					<br />
 					<span
 						use:tooltip={{ content: m.what_does_it_mean_text() }}
