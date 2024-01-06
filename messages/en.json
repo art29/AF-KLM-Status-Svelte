@@ -1,6 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"app_title": "Air France/KLM Status Page",
+	"app_title": "Air France/KLM Status",
 	"dismiss_alert": "Dismiss Alert",
 	"footer_contact": "For help, contact flightstatus[at]afetiveau[dot]com",
 	"footer_licensed_under": "Licensed under GNU General Public License v3.0",
@@ -8,7 +8,6 @@
 	"recently_viewed_flights": "Recently Viewed Flights",
 	"choose_another_flight": "Choose another flight",
 	"next_params_flights": "Next {flightNo} Flight(s)",
-	"back": "Back",
 	"updated_x_minutes_ago": "Updated {min}min ago",
 	"track_another_flight": "Track Another Flight",
 	"boarding_not_open": "Boarding not open",

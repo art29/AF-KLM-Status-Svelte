@@ -3,11 +3,9 @@
 	import { get } from 'svelte/store';
 	import { savedFlights } from '../../../../stores';
 	import { page } from '$app/stores';
-	import Button from '$lib/Button.svelte';
 	import Fa from 'svelte-fa';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import {
-		faArrowLeft,
 		faIdCard,
 		faInfoCircle,
 		faLuggageCart,
@@ -18,8 +16,7 @@
 		faWifi
 	} from '@fortawesome/free-solid-svg-icons';
 	import { DateTime } from 'luxon';
-	import { goto } from '$app/navigation';
-	import { callAFKLMAPI, route, stringArrayOrDash } from '$lib/helpers';
+	import { callAFKLMAPI, stringArrayOrDash } from '$lib/helpers';
 	import { sourceLanguageTag } from '$paraglide/runtime';
 	import Alert from '$lib/Alert.svelte';
 	import { DoubleBounce } from 'svelte-loading-spinners';
@@ -33,10 +30,6 @@
 	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
 	let error = false;
 	let loading = false;
-
-	const back = (): void => {
-		goto(route(`/${$page.params.flightNumber}`, $page.params.lang ?? sourceLanguageTag));
-	};
 
 	const refresh = (): void => {
 		loading = true;
@@ -124,12 +117,6 @@
 
 {#if flight}
 	<div class="flex flex-col mx-4 md:mx-[20%] gap-4">
-		<Button theme="secondary" textXl={false} on:click={back}>
-			<span class="mr-1">
-				<Fa icon={faArrowLeft} />
-			</span>
-			{m.back()}
-		</Button>
 		<h1 class="font-sans font-semibold text-4xl">
 			{flight.flightData.airline?.code}
 			{flight.flightData.flightNumber} - {flight.flightData.flightScheduleDate &&
