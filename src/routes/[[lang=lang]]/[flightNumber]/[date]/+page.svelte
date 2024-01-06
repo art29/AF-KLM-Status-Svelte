@@ -32,16 +32,20 @@
 	);
 	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
 	let error = false;
+	let loading = false;
 
 	const back = (): void => {
 		goto(route(`/${$page.params.flightNumber}`, $page.params.lang ?? sourceLanguageTag));
 	};
 
 	const refresh = (): void => {
+		loading = true;
 		callAFKLMAPI($page.params.flightNumber, lang).then(() => {
 			flight = get(savedFlights).find(
 				(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}`
 			);
+
+			loading = false;
 
 			if (!flight) {
 				error = true;
@@ -140,7 +144,9 @@
 						min: Math.floor((new Date().getTime() - Date.parse(String(flight.lastUpdated))) / 60000)
 					})}</span
 				>
-				<button on:click={refresh}><Fa size="lg" icon={faRotateRight}></Fa></button>
+				<button class={loading ? 'animate-spin' : ''} on:click={refresh}
+					><Fa size="lg" icon={faRotateRight}></Fa></button
+				>
 			</div>
 			<a class="text-gray-600" href={`/${$page.params.lang ?? sourceLanguageTag}`}
 				>{m.track_another_flight()}</a
