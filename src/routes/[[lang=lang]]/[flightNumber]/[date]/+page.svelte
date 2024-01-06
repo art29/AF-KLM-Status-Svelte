@@ -129,9 +129,9 @@
 		<h1 class="font-sans font-semibold text-4xl">
 			{flight.flightData.airline?.code}
 			{flight.flightData.flightNumber} - {flight.flightData.flightScheduleDate &&
-				DateTime.fromFormat(flight.flightData.flightScheduleDate, 'yyyy-LL-dd').toLocaleString(
-					DateTime.DATE_MED
-				)}
+				DateTime.fromFormat(flight.flightData.flightScheduleDate, 'yyyy-LL-dd')
+					.setLocale(lang)
+					.toLocaleString(DateTime.DATE_MED)}
 		</h1>
 		<div class="flex justify-between">
 			<div class="flex items-center text-gray-600">
@@ -238,15 +238,15 @@
 					<p class="text-lg">{m.gate()}</p>
 					<p class="text-xl font-semibold">
 						{stringArrayOrDash(flightLeg.arrivalInformation?.airport?.places?.gateNumber)}
+						{#if flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType}
+							<span class="text-gray-600 text-sm">
+								{contactType(
+									flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType,
+									flightLeg.arrivalInformation?.airport?.places?.disembarkingBusQuantity
+								)}
+							</span>
+						{/if}
 					</p>
-					{#if flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType}
-						<p class="text-gray-600">
-							{contactType(
-								flightLeg.arrivalInformation?.airport?.places?.disembarkingContactType,
-								flightLeg.arrivalInformation?.airport?.places?.disembarkingBusQuantity
-							)}
-						</p>
-					{/if}
 				</div>
 			</div>
 			<hr class="border-top border-[1px] border-black" />
@@ -296,7 +296,7 @@
 			</div>
 			<hr class="border-top border-[1px] border-black" />
 			<div class="flex justify-between items-center text-lg text-right">
-				<span class="gap-2 flex items-center">
+				<span class="gap-2 flex items-center text-left">
 					<Fa icon={faUserGear} size="lg"></Fa>
 					{m.pax_config()}
 				</span>
