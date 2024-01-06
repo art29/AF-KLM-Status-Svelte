@@ -228,6 +228,10 @@
 							</span>
 						{/if}
 					</p>
+					<p class="text-lg">{m.parking()}</p>
+					<p class="text-xl font-semibold">
+						{flightLeg.departureInformation?.airport?.places?.parkingPosition ?? '-'}
+					</p>
 				</div>
 				<div class="text-right">
 					<p class="text-lg">
@@ -246,6 +250,10 @@
 								)}
 							</span>
 						{/if}
+					</p>
+					<p class="text-lg">{m.parking()}</p>
+					<p class="text-xl font-semibold">
+						{flightLeg.arrivalInformation?.airport?.places?.parkingPosition ?? '-'}
 					</p>
 				</div>
 			</div>

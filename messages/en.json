@@ -38,5 +38,6 @@
 	"flight_not_found": "The flight you are looking for was not found. Please make sure it is a valid flight or try again later",
 	"about_info": "This website is made to have more information about the upcoming Air France / KLM Flights. It can be used to get the latest flight statuses, aircraft types and more.",
 	"disclaimer": "This website is <b>NOT</b> affiliated in any way with Air France, KLM or any other partners.",
-	"contact_info": "If you have any questions, bugs to report or anything else, feel free to reach out by email at flightstatus[at]afetiveau[dot]com. If you would like to contribute to the website, feel free to make a PR here: <a class='underline' href='https://github.com/art29/AF-KLM-Status-Svelte' target='_blank' rel='noopener' >https://github.com/art29/AF-KLM-Status-Svelte</a>."
+	"contact_info": "If you have any questions, bugs to report or anything else, feel free to reach out by email at flightstatus[at]afetiveau[dot]com. If you would like to contribute to the website, feel free to make a PR here: <a class='underline' href='https://github.com/art29/AF-KLM-Status-Svelte' target='_blank' rel='noopener' >https://github.com/art29/AF-KLM-Status-Svelte</a>.",
+	"parking": "Parking"
 }
