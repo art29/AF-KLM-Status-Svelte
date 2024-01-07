@@ -17,18 +17,18 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import { DateTime } from 'luxon';
 	import { callAFKLMAPI, stringArrayOrDash } from '$lib/helpers';
-	import { sourceLanguageTag } from '$paraglide/runtime';
+	import { type AvailableLanguageTag, sourceLanguageTag } from '$paraglide/runtime';
 	import Alert from '$lib/Alert.svelte';
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import FlightTimeDisplay from '$lib/FlightTimeDisplay.svelte';
 
+	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	const previouslySavedFlights = get(savedFlights);
 	const carrierCode = ($page.params.flightNumber.match(/^[A-Z]{2,3}/) || [''])[0];
 	const flightNumber = $page.params.flightNumber.replace(/^[A-Z]{2,3}/, '');
 	let flight = previouslySavedFlights.find(
-		(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}`
+		(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}` && f.lang === lang
 	);
-	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
 	let error = false;
 	let loading = false;
 
@@ -36,7 +36,7 @@
 		loading = true;
 		callAFKLMAPI($page.params.flightNumber, lang).then(() => {
 			flight = get(savedFlights).find(
-				(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}`
+				(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}` && f.lang === lang
 			);
 
 			loading = false;

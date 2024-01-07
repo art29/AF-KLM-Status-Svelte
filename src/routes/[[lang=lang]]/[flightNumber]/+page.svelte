@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { sourceLanguageTag } from '$paraglide/runtime';
+	import { sourceLanguageTag, type AvailableLanguageTag } from '$paraglide/runtime';
 	import LogoHeader from '$lib/LogoHeader.svelte';
 	import Button from '$lib/Button.svelte';
 	import * as m from '$paraglide/messages';
@@ -14,7 +14,7 @@
 	import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
-	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
+	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	let operationalFlights: OperationalFlight[] = [];
 	let error = false;
 	const previouslySavedFlights = get(savedFlights);
@@ -35,6 +35,7 @@
 		const flights = previouslySavedFlights.filter(
 			(f) =>
 				f.key.includes(`${carrierCode}_${flightNumber}_`) &&
+				f.lang === lang &&
 				Math.floor((new Date().getTime() - Date.parse(String(f.lastUpdated))) / 60000) <= 10
 		);
 

@@ -39,8 +39,9 @@ export const stringArrayOrDash = (stringArray?: string[]): string => {
 
 export const callAFKLMAPI = async (
 	flightNo: string,
-	lang: string
+	lang: AvailableLanguageTag
 ): Promise<components['schemas']['OperationalFlight'][]> => {
+	const apiLang = lang === 'en' ? 'en-GB' : 'fr-FR';
 	const carrierCode = (flightNo.match(/^[A-Z]{2,3}/) || [''])[0];
 	const flightNumber = flightNo.replace(/^[A-Z]{2,3}/, '');
 
@@ -57,7 +58,7 @@ export const callAFKLMAPI = async (
 		}&endRange=${endRange.toISOString().split('.')[0] + 'Z'}`,
 		{
 			headers: new Headers({
-				'accept-language': lang,
+				'accept-language': apiLang,
 				'Api-Key': env.PUBLIC_AIRFRANCE_KLM_API_KEY
 			})
 		}
@@ -83,7 +84,8 @@ export const callAFKLMAPI = async (
 					return {
 						key: `${carrierCode}_${flightNumber}_${f.flightScheduleDate}`,
 						flightData: f,
-						lastUpdated: new Date()
+						lastUpdated: new Date(),
+						lang: lang
 					};
 				});
 				savedFlights.set([
