@@ -7,18 +7,41 @@
 	import * as m from '$paraglide/messages';
 	import { goto } from '$app/navigation';
 	import { callAFKLMAPI, route } from '$lib/helpers';
-	import { type OperationalFlight } from '../../../stores';
+	import { type OperationalFlight, savedFlights } from '../../../stores';
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import Alert from '$lib/Alert.svelte';
+	import { get } from 'svelte/store';
+	import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
+	import Fa from 'svelte-fa';
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) === 'en' ? 'en-GB' : 'fr-FR';
 	let operationalFlights: OperationalFlight[] = [];
 	let error = false;
+	const previouslySavedFlights = get(savedFlights);
+	const carrierCode = ($page.params.flightNumber.match(/^[A-Z]{2,3}/) || [''])[0];
+	const flightNumber = $page.params.flightNumber.replace(/^[A-Z]{2,3}/, '');
+	let loading = false;
 
-	onMount(async () => {
+	const refresh = async (): Promise<void> => {
+		loading = true;
 		operationalFlights = await callAFKLMAPI($page.params.flightNumber, lang);
 		if (operationalFlights.length === 0) {
 			error = true;
+		}
+		loading = false;
+	};
+
+	onMount(async () => {
+		const flights = previouslySavedFlights.filter(
+			(f) =>
+				f.key.includes(`${carrierCode}_${flightNumber}_`) &&
+				Math.floor((new Date().getTime() - Date.parse(String(f.lastUpdated))) / 60000) <= 10
+		);
+
+		if (flights.length > 0) {
+			operationalFlights = flights.map((f) => f.flightData);
+		} else {
+			await refresh();
 		}
 	});
 
@@ -37,9 +60,14 @@
 		on:click={() => goto(route('/', $page.params.lang ?? sourceLanguageTag))}
 		>{m.choose_another_flight()}</Button
 	>
-	<h2 class="font-sans font-semibold text-xl">
-		{m.next_params_flights({ flightNo: $page.params.flightNumber })}
-	</h2>
+	<div class="flex items-center gap-2">
+		<h2 class="font-sans font-semibold text-xl">
+			{m.next_params_flights({ flightNo: $page.params.flightNumber })}
+		</h2>
+		<button class={loading ? 'animate-spin' : ''} on:click={refresh}
+			><Fa size="lg" icon={faRotateRight}></Fa></button
+		>
+	</div>
 	<div class="flex flex-col gap-2 w-full">
 		{#if operationalFlights.length === 0 && error === false}
 			<div class="flex flex-col items-center justify-center w-full h-32">

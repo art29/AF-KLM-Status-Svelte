@@ -20,6 +20,7 @@
 	import { sourceLanguageTag } from '$paraglide/runtime';
 	import Alert from '$lib/Alert.svelte';
 	import { DoubleBounce } from 'svelte-loading-spinners';
+	import FlightTimeDisplay from '$lib/FlightTimeDisplay.svelte';
 
 	const previouslySavedFlights = get(savedFlights);
 	const carrierCode = ($page.params.flightNumber.match(/^[A-Z]{2,3}/) || [''])[0];
@@ -84,33 +85,6 @@
 			default: {
 				return '';
 			}
-		}
-	};
-
-	const displayTime = (
-		scheduledTime?: string | undefined,
-		actual?: string | undefined,
-		estimated?: string | undefined
-	): string => {
-		let time = '';
-		if (!scheduledTime) {
-			return '-';
-		} else {
-			time = DateTime.fromISO(scheduledTime, {
-				setZone: true
-			}).toLocaleString(DateTime.TIME_24_SIMPLE);
-
-			if (actual) {
-				time += ` (${m.actual()}${DateTime.fromISO(actual, {
-					setZone: true
-				}).toLocaleString(DateTime.TIME_24_SIMPLE)})`;
-			} else if (estimated) {
-				time += ` (${m.estimated()}${DateTime.fromISO(estimated, {
-					setZone: true
-				}).toLocaleString(DateTime.TIME_24_SIMPLE)})`;
-			}
-
-			return time;
 		}
 	};
 </script>
@@ -181,22 +155,17 @@
 			<div class="flex justify-between mb-4">
 				<div>
 					<h4 class="text-2xl font-semibold">
-						{displayTime(
-							flightLeg.departureInformation?.times?.scheduled,
-							flightLeg.departureInformation?.times?.actual,
-							flightLeg.departureInformation?.times?.latestPublished
-						)}
+						<FlightTimeDisplay legTimes={flightLeg.departureInformation?.times}></FlightTimeDisplay>
 					</h4>
 					<p class="text-lg">{flightLeg.departureInformation?.airport?.nameLangTranl}</p>
 					<p class="text-lg">({flightLeg.departureInformation?.airport?.code})</p>
 				</div>
 				<div class="text-right">
 					<h4 class="text-2xl font-semibold">
-						{displayTime(
-							flightLeg.arrivalInformation?.times?.scheduled,
-							flightLeg.arrivalInformation?.times?.actual,
-							flightLeg.arrivalInformation?.times?.latestPublished
-						)}
+						<FlightTimeDisplay
+							scheduleDepartureTime={flightLeg.departureInformation?.times?.scheduled}
+							legTimes={flightLeg.arrivalInformation?.times}
+						></FlightTimeDisplay>
 					</h4>
 					<p class="text-lg">{flightLeg.arrivalInformation?.airport?.nameLangTranl}</p>
 					<p class="text-lg">({flightLeg.arrivalInformation?.airport?.code})</p>
