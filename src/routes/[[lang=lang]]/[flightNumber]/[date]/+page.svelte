@@ -21,6 +21,7 @@
 	import Alert from '$lib/Alert.svelte';
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import FlightTimeDisplay from '$lib/FlightTimeDisplay.svelte';
+	import type { components } from '../../../../../air-france-klm-api';
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	const previouslySavedFlights = get(savedFlights);
@@ -87,6 +88,34 @@
 			}
 		}
 	};
+
+	const statusColor = (
+		status: string | undefined,
+		arrivalTimes: components['schemas']['LegTimes'] | undefined
+	): string => {
+		let arrivalTimeDelay = 0;
+		if (arrivalTimes?.scheduled && arrivalTimes?.latestPublished) {
+			const latestTime = DateTime.fromISO(arrivalTimes.latestPublished, {
+				setZone: true
+			});
+			const scheduledTime = DateTime.fromISO(arrivalTimes.scheduled, {
+				setZone: true
+			});
+			arrivalTimeDelay = latestTime.diff(scheduledTime, 'minutes').minutes;
+		}
+		if (status === 'CANCELLED' || status === 'DIVERTED' || arrivalTimeDelay > 60) {
+			return 'text-red-600';
+		} else if (
+			status === 'NEW_DEPARTURE_TIME' ||
+			status === 'DELAYED_DEPARTURE' ||
+			status === 'DELAYED_ARRIVAL' ||
+			arrivalTimeDelay > 20
+		) {
+			return 'text-orange-700';
+		} else {
+			return 'text-green-700';
+		}
+	};
 </script>
 
 {#if flight}
@@ -120,7 +149,12 @@
 				</Alert>
 			{/if}
 			<div>
-				<h2 class="text-3xl text-green-700 font-semibold">
+				<h2
+					class={`text-3xl font-semibold ${statusColor(
+						flightLeg.legStatusPublic,
+						flightLeg.arrivalInformation?.times
+					)}`}
+				>
 					{flightLeg.legStatusPublicLangTransl}
 				</h2>
 				<h3 class="text-gray-600">
