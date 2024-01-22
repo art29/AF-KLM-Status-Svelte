@@ -181,7 +181,7 @@
 				></div>
 				<div
 					class="bg-gray-300 p-2 w-fit h-fit rounded-full absolute"
-					style="left: {flightLeg.completionPercentage}%"
+					style="left: calc({flightLeg.completionPercentage}% - 17px)"
 				>
 					<Fa icon={faPlane}></Fa>
 				</div>
