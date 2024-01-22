@@ -103,7 +103,7 @@
 			});
 			arrivalTimeDelay = latestTime.diff(scheduledTime, 'minutes').minutes;
 		}
-		if (status === 'CANCELLED' || status === 'DIVERTED' || arrivalTimeDelay > 60) {
+		if (status === 'CANCELLED' || status === 'DIVERTED') {
 			return 'text-red-600';
 		} else if (
 			status === 'NEW_DEPARTURE_TIME' ||
@@ -111,7 +111,7 @@
 			status === 'DELAYED_ARRIVAL' ||
 			arrivalTimeDelay > 20
 		) {
-			return 'text-orange-700';
+			return 'text-orange-600';
 		} else {
 			return 'text-green-700';
 		}
