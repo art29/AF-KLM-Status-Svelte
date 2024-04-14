@@ -22,6 +22,7 @@
 	import { DoubleBounce } from 'svelte-loading-spinners';
 	import FlightTimeDisplay from '$lib/FlightTimeDisplay.svelte';
 	import type { components } from '../../../../../air-france-klm-api';
+	import { onMount } from 'svelte';
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	const previouslySavedFlights = get(savedFlights);
@@ -35,7 +36,7 @@
 
 	const refresh = (): void => {
 		loading = true;
-		callAFKLMAPI($page.params.flightNumber, lang).then(() => {
+		callAFKLMAPI($page.params.flightNumber, lang, $page.params.date).then(() => {
 			flight = get(savedFlights).find(
 				(f) => f.key === `${carrierCode}_${flightNumber}_${$page.params.date}` && f.lang === lang
 			);
@@ -47,13 +48,6 @@
 			}
 		});
 	};
-
-	if (
-		!flight ||
-		Math.floor((new Date().getTime() - Date.parse(String(flight.lastUpdated))) / 60000) > 10
-	) {
-		refresh();
-	}
 
 	const boardingStatus = (boardingStatus?: string): string => {
 		switch (boardingStatus) {
@@ -116,6 +110,15 @@
 			return 'text-green-700';
 		}
 	};
+
+	onMount(() => {
+		if (
+			!flight ||
+			Math.floor((new Date().getTime() - Date.parse(String(flight.lastUpdated))) / 60000) > 10
+		) {
+			refresh();
+		}
+	});
 </script>
 
 {#if flight}

@@ -5,6 +5,7 @@
 	export let theme: 'primary' | 'viewed' | 'secondary' | 'danger' | 'none' = 'primary';
 	export let size: 'default' | 'block' = 'default';
 	export let textXl: boolean = true;
+	export let rounded: 'none' | 'left' | 'right' | 'full' = 'full';
 
 	export let disabled: boolean = false;
 
@@ -32,6 +33,19 @@
 		}
 	};
 
+	const roundedStyle = (): string => {
+		switch (rounded) {
+			case 'none':
+				return 'rounded-none';
+			case 'left':
+				return 'rounded-l-lg';
+			case 'right':
+				return 'rounded-r-lg';
+			case 'full':
+				return 'rounded-lg';
+		}
+	};
+
 	const dispatch = createEventDispatcher();
 
 	const handleClick = (): void => {
@@ -43,8 +57,8 @@
 	on:click={handleClick}
 	{type}
 	{disabled}
-	class="flex items-center justify-center rounded-lg px-3 py-2 {textXl &&
-		'text-xl'} disabled:pointer-events-none disabled:opacity-50 {sizeStyle()} {themeStyle()}"
+	class="flex items-center justify-center px-3 py-2 {textXl &&
+		'text-xl'} disabled:pointer-events-none disabled:opacity-50 {sizeStyle()} {themeStyle()} {roundedStyle()}"
 >
 	<slot />
 </button>

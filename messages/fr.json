@@ -39,5 +39,7 @@
 	"about_info": "Ce site web est conçu pour fournir plus d'informations sur les prochains vols Air France / KLM. Il peut être utilisé pour obtenir les derniers statuts de vol, types d'avions et plus encore.",
 	"disclaimer": "Ce site web n'est <b>PAS</b> affilié, d'aucunes manières avec Air France, KLM ou tout autre partenaire.",
 	"contact_info": "Si vous avez des questions, des bugs à signaler ou autre chose, n'hésitez pas à nous contacter par email à flightstatus[at]afetiveau[dot]com. Si vous souhaitez contribuer au site web, n'hésitez pas à faire une PR ici : <a class='underline' href='https://github.com/art29/AF-KLM-Status-Svelte' target='_blank' rel='noopener' >https://github.com/art29/AF-KLM-Status-Svelte</a>.",
-	"parking": "Parking"
+	"parking": "Parking",
+	"choose_other_date": "Choissisez une autre date",
+	"go": "Go"
 }

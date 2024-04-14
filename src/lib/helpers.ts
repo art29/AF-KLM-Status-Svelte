@@ -7,6 +7,7 @@ import { env } from '$env/dynamic/public';
 import { type OperationalFlight, savedFlights, type SavedFlights } from '../stores';
 import { get } from 'svelte/store';
 import type { components } from '../../air-france-klm-api';
+import dayjs from 'dayjs';
 
 /**
  * Returns the path in the given language, regardless of which language the path is in.
@@ -39,16 +40,23 @@ export const stringArrayOrDash = (stringArray?: string[]): string => {
 
 export const callAFKLMAPI = async (
 	flightNo: string,
-	lang: AvailableLanguageTag
+	lang: AvailableLanguageTag,
+	date?: string
 ): Promise<components['schemas']['OperationalFlight'][]> => {
 	const apiLang = lang === 'en' ? 'en-GB' : 'fr-FR';
 	const carrierCode = (flightNo.match(/^[A-Z]{2,3}/) || [''])[0];
 	const flightNumber = flightNo.replace(/^[A-Z]{2,3}/, '');
 
-	const startRange = new Date();
-	startRange.setDate(startRange.getDate() - 1); // Set date 24h before
-	const endRange = new Date();
-	endRange.setDate(endRange.getDate() + 3); // Set date 72h after
+	let startRange;
+	let endRange;
+
+	if (date && dayjs(date).isValid()) {
+		startRange = dayjs(date).startOf('day').toDate();
+		endRange = dayjs(date).endOf('day').toDate();
+	} else {
+		startRange = dayjs().subtract(1, 'day').toDate();
+		endRange = dayjs().add(3, 'day').toDate();
+	}
 
 	let operationalFlights: components['schemas']['OperationalFlight'][] = [];
 
@@ -59,7 +67,7 @@ export const callAFKLMAPI = async (
 		{
 			headers: new Headers({
 				'accept-language': apiLang,
-				'Api-Key': env.PUBLIC_AIRFRANCE_KLM_API_KEY
+				'Api-Key': env.PUBLIC_AIRFRANCE_KLM_API_KEY ?? ''
 			})
 		}
 	)

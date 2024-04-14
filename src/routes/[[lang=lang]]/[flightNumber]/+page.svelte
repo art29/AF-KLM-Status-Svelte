@@ -13,6 +13,8 @@
 	import { get } from 'svelte/store';
 	import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
+	import dayjs from 'dayjs';
+	import { DateInput } from 'date-picker-svelte';
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	let operationalFlights: OperationalFlight[] = [];
@@ -21,6 +23,7 @@
 	const carrierCode = ($page.params.flightNumber.match(/^[A-Z]{2,3}/) || [''])[0];
 	const flightNumber = $page.params.flightNumber.replace(/^[A-Z]{2,3}/, '');
 	let loading = false;
+	let customDate = new Date();
 
 	const refresh = async (): Promise<void> => {
 		loading = true;
@@ -40,7 +43,13 @@
 		);
 
 		if (flights.length > 0) {
-			operationalFlights = flights.map((f) => f.flightData);
+			// only get dates from -1 day to +3 days
+			operationalFlights = flights
+				.map((f) => f.flightData)
+				.filter((f) => {
+					const date = dayjs(f.flightScheduleDate);
+					return date.isAfter(dayjs().subtract(1, 'day')) && date.isBefore(dayjs().add(3, 'day'));
+				});
 		} else {
 			await refresh();
 		}
@@ -50,6 +59,17 @@
 		if (date) {
 			goto(route(`/${$page.params.flightNumber}/${date}`, $page.params.lang ?? sourceLanguageTag));
 		}
+	};
+
+	const goToCustomDate = () => {
+		return () => {
+			goto(
+				route(
+					`/${$page.params.flightNumber}/${dayjs(customDate).format('YYYY-MM-DD')}`,
+					$page.params.lang ?? sourceLanguageTag
+				)
+			);
+		};
 	};
 </script>
 
@@ -86,5 +106,18 @@
 				{operationalFlight.flightScheduleDate}
 			</Button>
 		{/each}
+		<h3 class="font-sans font-semibold text-lg text-center">
+			{m.choose_other_date()}
+		</h3>
+		<div class="flex justify-center">
+			<DateInput
+				bind:value={customDate}
+				format="dd/MM/yyyy"
+				class="[&>input]:!rounded-l-lg [&>input]:!py-2 [&>input]:!w-full [&>input]:text-center w-full"
+			/>
+			<Button rounded="right" textXl={false} disabled={!customDate} on:click={goToCustomDate()}
+				>{m.go()}</Button
+			>
+		</div>
 	</div>
 </div>
