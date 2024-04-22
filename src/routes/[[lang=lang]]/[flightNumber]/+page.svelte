@@ -15,10 +15,8 @@
 	import Fa from 'svelte-fa';
 	import { DateInput } from 'date-picker-svelte';
 	import dayjs from 'dayjs';
-	import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-	import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-	dayjs.extend(isSameOrBefore);
-	dayjs.extend(isSameOrAfter);
+	import isBetween from 'dayjs/plugin/isBetween';
+	dayjs.extend(isBetween);
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	let operationalFlights: OperationalFlight[] = [];
@@ -52,9 +50,11 @@
 				.map((f) => f.flightData)
 				.filter((f) => {
 					const date = dayjs(f.flightScheduleDate);
-					return (
-						date.isSameOrAfter(dayjs().subtract(1, 'day')) &&
-						date.isSameOrBefore(dayjs().add(3, 'day'))
+					return date.isBetween(
+						dayjs().startOf('day').subtract(1, 'day'),
+						dayjs().endOf('day').add(3, 'day'),
+						null,
+						'[]'
 					);
 				});
 		} else {
