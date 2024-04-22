@@ -13,8 +13,12 @@
 	import { get } from 'svelte/store';
 	import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import dayjs from 'dayjs';
 	import { DateInput } from 'date-picker-svelte';
+	import dayjs from 'dayjs';
+	import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+	import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+	dayjs.extend(isSameOrBefore);
+	dayjs.extend(isSameOrAfter);
 
 	const lang = ($page.params.lang ?? sourceLanguageTag) as AvailableLanguageTag;
 	let operationalFlights: OperationalFlight[] = [];
@@ -48,7 +52,10 @@
 				.map((f) => f.flightData)
 				.filter((f) => {
 					const date = dayjs(f.flightScheduleDate);
-					return date.isAfter(dayjs().subtract(1, 'day')) && date.isBefore(dayjs().add(3, 'day'));
+					return (
+						date.isSameOrAfter(dayjs().subtract(1, 'day')) &&
+						date.isSameOrBefore(dayjs().add(3, 'day'))
+					);
 				});
 		} else {
 			await refresh();
