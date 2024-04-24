@@ -151,6 +151,11 @@
 					{flightLeg.irregularity?.delayReasonPublicLangTransl}
 				</Alert>
 			{/if}
+			{#if flightLeg.irregularity?.cancellationReasonPublicLong}
+				<Alert>
+					{flightLeg.irregularity?.cancellationReasonPublicLong}
+				</Alert>
+			{/if}
 			<div>
 				<h2
 					class={`text-3xl font-semibold ${statusColor(

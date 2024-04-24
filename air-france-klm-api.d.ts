@@ -62,6 +62,9 @@ export interface components {
 			publicDisruptionReason?: string;
 			scheduledActionCode?: string;
 			scheduledChangeReason?: string;
+			cancellationReasonCodePublic?: string;
+			cancellationReasonPublicLong?: string;
+			cancellationReasonPublicShort?: string;
 		};
 		FlightLeg: {
 			aircraft?: components['schemas']['Aircraft'];
