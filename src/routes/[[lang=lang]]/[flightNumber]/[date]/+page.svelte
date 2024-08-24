@@ -303,7 +303,7 @@
 						? `(${flightLeg.aircraft.registration[0]}-${flightLeg.aircraft.registration.substring(
 								1
 							)})`
-						: '-'}
+						: ''}
 				</span>
 			</div>
 			<hr class="border-top border-[1px] border-black" />

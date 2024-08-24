@@ -119,6 +119,7 @@
 		<div class="flex justify-center">
 			<DateInput
 				bind:value={customDate}
+				max={dayjs().add(1, 'year').toDate()}
 				format="dd/MM/yyyy"
 				class="[&>input]:!rounded-l-lg [&>input]:!py-2 [&>input]:!w-full [&>input]:text-center w-full"
 			/>
