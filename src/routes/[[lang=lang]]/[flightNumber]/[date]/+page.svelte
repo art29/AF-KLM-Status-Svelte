@@ -151,7 +151,7 @@
 					{flightLeg.irregularity?.delayReasonPublicLangTransl}
 				</Alert>
 			{/if}
-			{#if flightLeg.irregularity?.cancellationReasonPublicLong}
+			{#if (flightLeg.legStatusPublic === 'CANCELLED' || flightLeg.legStatusPublic === 'DIVERTED') && flightLeg.irregularity?.cancellationReasonPublicLong}
 				<Alert>
 					{flightLeg.irregularity?.cancellationReasonPublicLong}
 				</Alert>
