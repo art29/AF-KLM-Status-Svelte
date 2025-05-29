@@ -16,7 +16,12 @@
 		faWifi
 	} from '@fortawesome/free-solid-svg-icons';
 	import { DateTime } from 'luxon';
-	import { callAFKLMAPI, stringArrayOrDash } from '$lib/helpers';
+	import {
+		callAFKLMAPI,
+		capitalizeEachWord,
+		displayCityWithCode,
+		stringArrayOrDash
+	} from '$lib/helpers';
 	import { type AvailableLanguageTag, sourceLanguageTag } from '$paraglide/runtime';
 	import Alert from '$lib/Alert.svelte';
 	import { DoubleBounce } from 'svelte-loading-spinners';
@@ -111,6 +116,56 @@
 		}
 	};
 
+	const legStatusTranslate = (leg: components['schemas']['FlightLeg']) => {
+		switch (leg.legStatusPublic) {
+			case 'PARTIALLY_CANCELLED': {
+				return m.partially_cancelled();
+			}
+			case 'CANCELLED': {
+				return m.cancelled();
+			}
+			case 'ARRIVED': {
+				return m.arrived();
+			}
+			case 'LANDED': {
+				return m.landed();
+			}
+			case 'EARLY_ARRIVAL': {
+				return m.early_arrival();
+			}
+			case 'DELAYED_ARRIVAL': {
+				return m.delayed_arrival();
+			}
+			case 'IN_FLIGHT': {
+				return m.in_flight();
+			}
+			case 'DEPARTED': {
+				return m.departed();
+			}
+			case 'DELAYED_DEPARTURE': {
+				return m.delayed_departure();
+			}
+			case 'EARLY_DEPARTURE': {
+				return m.early_departure();
+			}
+			case 'NEW_EARLY_DEPARTURE_TIME': {
+				return m.new_early_departure_time();
+			}
+			case 'NEW_DEPARTURE_TIME': {
+				return m.new_departure_time();
+			}
+			case 'DIVERTED': {
+				return m.diverted();
+			}
+			case 'ON_TIME': {
+				return m.on_time();
+			}
+			default: {
+				return leg.statusName ?? leg.legStatusPublic;
+			}
+		}
+	};
+
 	onMount(() => {
 		if (
 			!flight ||
@@ -146,9 +201,9 @@
 			>
 		</div>
 		{#each flight.flightData.flightLegs ?? [] as flightLeg}
-			{#if flightLeg.irregularity?.delayReasonPublicLangTransl}
+			{#if flightLeg.irregularity?.delayReasonPublic}
 				<Alert>
-					{flightLeg.irregularity?.delayReasonPublicLangTransl}
+					{flightLeg.irregularity?.delayReasonPublic}
 				</Alert>
 			{/if}
 			{#if (flightLeg.legStatusPublic === 'CANCELLED' || flightLeg.legStatusPublic === 'DIVERTED') && flightLeg.irregularity?.cancellationReasonPublicLong}
@@ -163,7 +218,7 @@
 						flightLeg.arrivalInformation?.times
 					)}`}
 				>
-					{flightLeg.legStatusPublicLangTransl}
+					{legStatusTranslate(flightLeg)}
 				</h2>
 				<h3 class="text-gray-600">
 					{boardingStatus(flightLeg.otherFlightLegStatuses?.boardingStatus)}
@@ -199,7 +254,13 @@
 					<h4 class="text-2xl font-semibold">
 						<FlightTimeDisplay legTimes={flightLeg.departureInformation?.times}></FlightTimeDisplay>
 					</h4>
-					<p class="text-lg">{flightLeg.departureInformation?.airport?.nameLangTranl}</p>
+					<p class="text-lg">
+						{displayCityWithCode(
+							flightLeg.departureInformation?.airport?.city.name,
+							flightLeg.departureInformation?.airport?.city?.country?.code
+						)}
+					</p>
+					<p class="text-lg">{capitalizeEachWord(flightLeg.departureInformation?.airport?.name)}</p>
 					<p class="text-lg">({flightLeg.departureInformation?.airport?.code})</p>
 				</div>
 				<div class="text-right">
@@ -209,7 +270,13 @@
 							legTimes={flightLeg.arrivalInformation?.times}
 						></FlightTimeDisplay>
 					</h4>
-					<p class="text-lg">{flightLeg.arrivalInformation?.airport?.nameLangTranl}</p>
+					<p class="text-lg">
+						{displayCityWithCode(
+							flightLeg.arrivalInformation?.airport?.city.name,
+							flightLeg.arrivalInformation?.airport?.city?.country?.code
+						)}
+					</p>
+					<p class="text-lg">{capitalizeEachWord(flightLeg.arrivalInformation?.airport?.name)}</p>
 					<p class="text-lg">({flightLeg.arrivalInformation?.airport?.code})</p>
 				</div>
 			</div>
