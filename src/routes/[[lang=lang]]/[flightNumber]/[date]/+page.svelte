@@ -201,9 +201,10 @@
 			>
 		</div>
 		{#each flight.flightData.flightLegs ?? [] as flightLeg}
-			{#if flightLeg.irregularity?.delayReasonPublic}
+			{#if flightLeg.irregularity?.delayReasonPublic || flightLeg.irregularity?.delayReasonPublicLangTransl}
 				<Alert>
-					{flightLeg.irregularity?.delayReasonPublic}
+					{flightLeg?.irregularity?.delayReasonPublicLangTransl ??
+						flightLeg.irregularity?.delayReasonPublic}
 				</Alert>
 			{/if}
 			{#if (flightLeg.legStatusPublic === 'CANCELLED' || flightLeg.legStatusPublic === 'DIVERTED') && flightLeg.irregularity?.cancellationReasonPublicLong}
@@ -218,7 +219,7 @@
 						flightLeg.arrivalInformation?.times
 					)}`}
 				>
-					{legStatusTranslate(flightLeg)}
+					{flightLeg.legStatusPublicLangTransl ?? legStatusTranslate(flightLeg)}
 				</h2>
 				<h3 class="text-gray-600">
 					{boardingStatus(flightLeg.otherFlightLegStatuses?.boardingStatus)}
@@ -260,7 +261,10 @@
 							flightLeg.departureInformation?.airport?.city?.country?.code
 						)}
 					</p>
-					<p class="text-lg">{capitalizeEachWord(flightLeg.departureInformation?.airport?.name)}</p>
+					<p class="text-lg">
+						{flightLeg.departureInformation?.airport?.nameLangTranl ??
+							capitalizeEachWord(flightLeg.departureInformation?.airport?.name)}
+					</p>
 					<p class="text-lg">({flightLeg.departureInformation?.airport?.code})</p>
 				</div>
 				<div class="text-right">
@@ -276,7 +280,10 @@
 							flightLeg.arrivalInformation?.airport?.city?.country?.code
 						)}
 					</p>
-					<p class="text-lg">{capitalizeEachWord(flightLeg.arrivalInformation?.airport?.name)}</p>
+					<p class="text-lg">
+						{flightLeg.arrivalInformation?.airport?.nameLangTranl ??
+							capitalizeEachWord(flightLeg.arrivalInformation?.airport?.name)}
+					</p>
 					<p class="text-lg">({flightLeg.arrivalInformation?.airport?.code})</p>
 				</div>
 			</div>
